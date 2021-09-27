@@ -8,10 +8,7 @@ namespace API.Interfaces
 
     public interface IMediaRepository
     {
-        Task<bool> SaveAllAsync();
-        Task<List<Media>> SearchMediaAsync(string query);
-        Task<List<Media>> GetPagedAsync(MediaParams movieParams);
-        Task<Media> GetMediaAync(int id);
-
+        Task<List<Media>> GetMediaAsync(MediaParams movieParams);
+        Task<Media> GetSingleMediaAync(int id);
     }
 }

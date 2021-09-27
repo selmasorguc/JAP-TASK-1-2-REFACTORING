@@ -14,96 +14,81 @@ namespace API.Data
 
     public class MediaRepository : IMediaRepository
     {
-        private readonly IMapper _mapper;
         private readonly DataContext _context;
-        private IQueryable<Media> baseQuery;
-
         public MediaRepository(DataContext context)
         {
             _context = context;
-            baseQuery = _context.Media.Include(m => m.Cast)
-                                       .Include(m => m.Ratings)
-                                       .OrderByDescending(x => x.Ratings
-                                       .Select(x => x.Value).Average());
         }
 
         //Get 1 movie/tvshow from DB by id
-        public async Task<Media> GetMediaAync(int id)
+        public async Task<Media> GetSingleMediaAync(int id)
         {
-            return await _context.Media.Include(m => m.Ratings)
-                                       .Include(m => m.Cast)
+            return await _context.Media.Include(m => m.Cast)
+                                       .Include(m => m.Ratings)
                                        .Include(x => x.Screenings)
+                                       .OrderByDescending(x => x.Ratings
+                                       .Select(x => x.Value).Average()).Include(m => m.Ratings)
                                        .FirstOrDefaultAsync(m => m.Id == id);
         }
 
-        //Get movies or tv shows paginated
-        //Media params take page num, size and media type you wanna get
-        public async Task<List<Media>> GetPagedAsync(MediaParams mediaParams)
+        public async Task<List<Media>> GetMediaAsync(MediaParams mediaParams)
         {
+            IQueryable<Media> query = _context.Media.Include(m => m.Cast)
+                                             .Include(m => m.Ratings)
+                                             .Include(x => x.Screenings).AsQueryable();
 
-            var movies = await baseQuery.Concat(
-                baseQuery.Where(m => m.MediaType == mediaParams.MediaType)
-                         .Skip((mediaParams.PageNumber - 1) * mediaParams.PageSize)
-                         .Take(mediaParams.PageSize)).ToListAsync();
+            if (mediaParams.SearchQuery != null) query = SearchFilter(query, mediaParams.SearchQuery);
+
+            if (mediaParams.MediaType != null) query = query.Where(m => m.MediaType == mediaParams.MediaType);
+
+            List<Media> movies = await query.OrderByDescending(x => x.Ratings.Select(x => x.Value).Average())
+                                             .Skip((mediaParams.PageNumber - 1) * mediaParams.PageSize)
+                                             .Take(mediaParams.PageSize).ToListAsync();
             return movies;
         }
 
-        //Save changes in DB
-        public async Task<bool> SaveAllAsync()
+        //Private function that expands the basic query with a search filter applied
+        private IQueryable<Media> SearchFilter(IQueryable<Media> query, string searchTerm)
         {
-            return await _context.SaveChangesAsync() > 0;
-        }
+            //First we search by title and description
+            query = query.Where(m => m.Title.ToLower()
+                                             .Contains(searchTerm.ToLower()) || m.Description.ToLower()
+                                             .Contains(searchTerm.ToLower()));
 
-        //Search media by query string (created for search bar filtering)
-        public async Task<List<Media>> SearchMediaAsync(string query)
-        {
-            //Starting with the basic media db query - searching by title and description
-            var mediaDbQuery = baseQuery.Concat(
-                                        baseQuery.Where(m => m.Title.ToLower()
-                                                 .Contains(query.ToLower()) || m.Description.ToLower()
-                                                 .Contains(query.ToLower())));
-
-            //Keywords check
+            //Keywords check 
+            //Checking if the user looked for movies based on rating or release year
             int numericValue;
-            bool isNumber = int.TryParse(Regex.Match(query, @"\d+").Value, out numericValue);
+            bool isNumber = int.TryParse(Regex.Match(searchTerm, @"\d+").Value, out numericValue);
 
-            if (query.ToLower().Contains("star") && isNumber && numericValue.ToString().Length == 1)
+            if (searchTerm.ToLower().Contains("star")
+            && isNumber && numericValue.ToString().Length == 1)
             {
-                if (query.ToLower().Contains("at least"))
-                {
-                    mediaDbQuery.Concat(mediaDbQuery
-                                .Where(m => m.Ratings.Average(x => x.Value) >= numericValue));
-                }
+                if (searchTerm.ToLower().Contains("at least"))
+                    query = query.Where(m => m.Ratings.Average(x => x.Value) >= numericValue);
+
                 else
-                {
-                    mediaDbQuery.Concat(mediaDbQuery
-                    .Where(m => m.Ratings.Average(x => x.Value) == numericValue)
-                    .OrderByDescending(x => x.Ratings.Select(x => x.Value).Average()));
-                }
+                    query = query.Where(m => m.Ratings.Average(x => x.Value) == numericValue);
             }
 
-            if (query.ToLower().Contains("year") && isNumber && numericValue.ToString().Length == 1)
+            if (searchTerm.ToLower().Contains("year") && isNumber && numericValue.ToString().Length == 1)
             {
-                if (query.ToLower().Contains("older"))
-                    mediaDbQuery.Concat(mediaDbQuery
-                                .Where(m => DateTime.Now.Year - m.ReleaseDate.Year >= numericValue));
+                if (searchTerm.ToLower().Contains("older"))
+                    query = query.Where(m => DateTime.Now.Year - m.ReleaseDate.Year >= numericValue);
 
                 else
-                    mediaDbQuery.Concat(mediaDbQuery
-                                .Where(m => DateTime.Now.Year - m.ReleaseDate.Year <= numericValue));
-
+                    query = query.Where(m => DateTime.Now.Year - m.ReleaseDate.Year <= numericValue);
             }
 
             if (isNumber && numericValue.ToString().Length == 4)
             {
-                if (query.ToLower().Contains("after"))
-                    mediaDbQuery.Concat(mediaDbQuery.Where(m => m.ReleaseDate.Year > numericValue));
+                if (searchTerm.ToLower().Contains("after"))
+                    query = query.Where(m => m.ReleaseDate.Year > numericValue);
 
                 else
-                    mediaDbQuery.Concat(mediaDbQuery.Where(m => m.ReleaseDate.Year == numericValue));
+                    query = query.Where(m => m.ReleaseDate.Year == numericValue);
 
             }
-            return await mediaDbQuery.ToListAsync();
+            return query;
         }
     }
 }

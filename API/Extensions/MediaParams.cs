@@ -10,8 +10,10 @@ namespace API.Helpers
 
         private int _pageSize = 10;
 
-        public MediaType MediaType { get; set; } = MediaType.Movie;
+        public MediaType? MediaType { get; set; }
 
         public int PageSize { get => _pageSize; set => _pageSize = (value > MaxPageSize) ? MaxPageSize : value; }
+
+        public string? SearchQuery { get; set; } =  null;
     }
 }

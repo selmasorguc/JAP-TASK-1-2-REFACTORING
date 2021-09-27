@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20210924075243_InitialCreate")]
+    [Migration("20210927144536_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,7 +28,10 @@ namespace API.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Name")
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -49,8 +52,8 @@ namespace API.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsMovie")
-                        .HasColumnType("bit");
+                    b.Property<int>("MediaType")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");
@@ -70,7 +73,7 @@ namespace API.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("MovieId")
+                    b.Property<int>("MediaId")
                         .HasColumnType("int");
 
                     b.Property<double>("Value")
@@ -78,7 +81,7 @@ namespace API.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MovieId");
+                    b.HasIndex("MediaId");
 
                     b.ToTable("Ratings");
                 });
@@ -93,10 +96,7 @@ namespace API.Data.Migrations
                     b.Property<int>("MaxSeatsNumber")
                         .HasColumnType("int");
 
-                    b.Property<int?>("MediaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MovieId")
+                    b.Property<int>("MediaId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
@@ -114,10 +114,10 @@ namespace API.Data.Migrations
                     b.Property<double>("AverageRating")
                         .HasColumnType("float");
 
-                    b.Property<int>("MovieId")
+                    b.Property<int>("MediaId")
                         .HasColumnType("int");
 
-                    b.Property<string>("MovieTitle")
+                    b.Property<string>("MediaTitle")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TotalRatings")
@@ -128,10 +128,10 @@ namespace API.Data.Migrations
 
             modelBuilder.Entity("API.Entity.StoredProceduresEntites.TopScreened", b =>
                 {
-                    b.Property<int>("MovieId")
+                    b.Property<int>("MediaId")
                         .HasColumnType("int");
 
-                    b.Property<string>("MovieTitle")
+                    b.Property<string>("MediaTitle")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TotalScreenings")
@@ -142,10 +142,10 @@ namespace API.Data.Migrations
 
             modelBuilder.Entity("API.Entity.StoredProceduresEntites.TopSold", b =>
                 {
-                    b.Property<int>("MovieId")
+                    b.Property<int>("MediaId")
                         .HasColumnType("int");
 
-                    b.Property<string>("MovieTitle")
+                    b.Property<string>("MediaTitle")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TicketsSold")
@@ -161,7 +161,7 @@ namespace API.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("MovieId")
+                    b.Property<int>("MediaId")
                         .HasColumnType("int");
 
                     b.Property<double>("Price")
@@ -209,32 +209,34 @@ namespace API.Data.Migrations
                     b.Property<int>("CastId")
                         .HasColumnType("int");
 
-                    b.Property<int>("MoviesId")
+                    b.Property<int>("MediaId")
                         .HasColumnType("int");
 
-                    b.HasKey("CastId", "MoviesId");
+                    b.HasKey("CastId", "MediaId");
 
-                    b.HasIndex("MoviesId");
+                    b.HasIndex("MediaId");
 
                     b.ToTable("ActorMedia");
                 });
 
             modelBuilder.Entity("API.Entity.Rating", b =>
                 {
-                    b.HasOne("API.Entity.Media", "Movie")
+                    b.HasOne("API.Entity.Media", "Media")
                         .WithMany("Ratings")
-                        .HasForeignKey("MovieId")
+                        .HasForeignKey("MediaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Movie");
+                    b.Navigation("Media");
                 });
 
             modelBuilder.Entity("API.Entity.Screening", b =>
                 {
                     b.HasOne("API.Entity.Media", null)
                         .WithMany("Screenings")
-                        .HasForeignKey("MediaId");
+                        .HasForeignKey("MediaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("API.Entity.Ticket", b =>
@@ -266,7 +268,7 @@ namespace API.Data.Migrations
 
                     b.HasOne("API.Entity.Media", null)
                         .WithMany()
-                        .HasForeignKey("MoviesId")
+                        .HasForeignKey("MediaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

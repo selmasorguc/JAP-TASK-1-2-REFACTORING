@@ -19,15 +19,12 @@ namespace API.Services
             _mediaRepository = mediaRepository;
         }
 
-        public async Task<List<MediaDto>> GetPagedAsync(MediaParams movieParams)
+        public async Task<List<MediaDto>> GetMediaAsync(MediaParams movieParams)
         {
+
             return _mapper.Map<List<MediaDto>>(
-            await _mediaRepository.GetPagedAsync(movieParams));
+            await _mediaRepository.GetMediaAsync(movieParams));
         }
 
-        public async Task<List<MediaDto>> SearchMediaAsync(string query)
-        {
-            return _mapper.Map<List<MediaDto>>(await _mediaRepository.SearchMediaAsync(query));
-        }
     }
 }

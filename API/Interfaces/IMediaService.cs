@@ -9,7 +9,6 @@ namespace API.Interfaces
 {
     public interface IMediaService
     {
-        Task<List<MediaDto>> SearchMediaAsync(string query);
-        Task<List<MediaDto>> GetPagedAsync(MediaParams movieParams);
+        Task<List<MediaDto>> GetMediaAsync(MediaParams movieParams);
     }
 }

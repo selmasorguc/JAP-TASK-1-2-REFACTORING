@@ -19,18 +19,11 @@ namespace API.Controllers
             _mediaService = mediaService;
         }
 
-        [HttpGet("search")]
-        public async Task<ActionResult<List<MediaDto>>> SearchMediaAsync(
-            [FromQuery] string query)
-        {
-            return Ok(await _mediaService.SearchMediaAsync(query));
-        }
-
         [HttpGet]
-        public async Task<ActionResult<List<MediaDto>>> GetMoviesPaged(
+        public async Task<ActionResult<List<MediaDto>>> GetMedia(
             [FromQuery] MediaParams movieParams)
         {
-            var movies = await _mediaService.GetPagedAsync(movieParams);
+            var movies = await _mediaService.GetMediaAsync(movieParams);
             return Ok(movies);
         }
     }

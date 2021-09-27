@@ -27,7 +27,7 @@ namespace API.Services
             var serviceResponse = new ServiceResponse<double>();
             try
             {
-                var media = await _mediaRepository.GetMediaAync(mediaId);
+                var media = await _mediaRepository.GetSingleMediaAync(mediaId);
                 if (media == null) throw new ArgumentException("Media does not exist");
 
                 //Check if movie has any ratings
@@ -56,7 +56,7 @@ namespace API.Services
             var serviceResponse = new ServiceResponse<double>();
             try
             {
-                var media = await _mediaRepository.GetMediaAync(rating.MediaId);
+                var media = await _mediaRepository.GetSingleMediaAync(rating.MediaId);
                 if (media == null) throw new ArgumentException("Media does not exist");
 
                 await _ratingRepository.AddRating(_mapper.Map<Rating>(rating));

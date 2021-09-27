@@ -13,7 +13,8 @@ namespace API.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -30,7 +31,7 @@ namespace API.Data.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ReleaseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CoverUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsMovie = table.Column<bool>(type: "bit", nullable: false)
+                    MediaType = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -41,8 +42,8 @@ namespace API.Data.Migrations
                 name: "TopRatedMovies",
                 columns: table => new
                 {
-                    MovieId = table.Column<int>(type: "int", nullable: false),
-                    MovieTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MediaId = table.Column<int>(type: "int", nullable: false),
+                    MediaTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AverageRating = table.Column<double>(type: "float", nullable: false),
                     TotalRatings = table.Column<int>(type: "int", nullable: false)
                 },
@@ -54,8 +55,8 @@ namespace API.Data.Migrations
                 name: "TopScreenedMovies",
                 columns: table => new
                 {
-                    MovieId = table.Column<int>(type: "int", nullable: false),
-                    MovieTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MediaId = table.Column<int>(type: "int", nullable: false),
+                    MediaTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TotalScreenings = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -66,8 +67,8 @@ namespace API.Data.Migrations
                 name: "TopSoldMovies",
                 columns: table => new
                 {
-                    MovieId = table.Column<int>(type: "int", nullable: false),
-                    MovieTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MediaId = table.Column<int>(type: "int", nullable: false),
+                    MediaTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TicketsSold = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -94,11 +95,11 @@ namespace API.Data.Migrations
                 columns: table => new
                 {
                     CastId = table.Column<int>(type: "int", nullable: false),
-                    MoviesId = table.Column<int>(type: "int", nullable: false)
+                    MediaId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ActorMedia", x => new { x.CastId, x.MoviesId });
+                    table.PrimaryKey("PK_ActorMedia", x => new { x.CastId, x.MediaId });
                     table.ForeignKey(
                         name: "FK_ActorMedia_Actors_CastId",
                         column: x => x.CastId,
@@ -106,8 +107,8 @@ namespace API.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ActorMedia_Media_MoviesId",
-                        column: x => x.MoviesId,
+                        name: "FK_ActorMedia_Media_MediaId",
+                        column: x => x.MediaId,
                         principalTable: "Media",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -120,14 +121,14 @@ namespace API.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Value = table.Column<double>(type: "float", nullable: false),
-                    MovieId = table.Column<int>(type: "int", nullable: false)
+                    MediaId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Ratings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Ratings_Media_MovieId",
-                        column: x => x.MovieId,
+                        name: "FK_Ratings_Media_MediaId",
+                        column: x => x.MediaId,
                         principalTable: "Media",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -141,8 +142,7 @@ namespace API.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     MaxSeatsNumber = table.Column<int>(type: "int", nullable: false),
-                    MovieId = table.Column<int>(type: "int", nullable: false),
-                    MediaId = table.Column<int>(type: "int", nullable: true)
+                    MediaId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -152,7 +152,7 @@ namespace API.Data.Migrations
                         column: x => x.MediaId,
                         principalTable: "Media",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -164,7 +164,7 @@ namespace API.Data.Migrations
                     Price = table.Column<double>(type: "float", nullable: false),
                     ScreeningId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    MovieId = table.Column<int>(type: "int", nullable: false)
+                    MediaId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -184,14 +184,14 @@ namespace API.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ActorMedia_MoviesId",
+                name: "IX_ActorMedia_MediaId",
                 table: "ActorMedia",
-                column: "MoviesId");
+                column: "MediaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Ratings_MovieId",
+                name: "IX_Ratings_MediaId",
                 table: "Ratings",
-                column: "MovieId");
+                column: "MediaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Screenings_MediaId",
@@ -241,7 +241,5 @@ namespace API.Data.Migrations
             migrationBuilder.DropTable(
                 name: "Media");
         }
-
-        
     }
 }
