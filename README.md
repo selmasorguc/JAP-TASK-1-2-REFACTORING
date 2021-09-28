@@ -1,5 +1,5 @@
-# MovieApp BACKEND
-# Junior Accelerator Program Task 1-2 Movie Application after review REFACTORING
+# JAP MovieApp BACKEND
+## Junior Accelerator Program Task 1-2 Movie Application after review REFACTORING
 
 Technologies used:
  - ASP .NET Core API
