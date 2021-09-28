@@ -56,16 +56,20 @@ After you make the login API call, copy the token and click on the Authorize but
 
 ## API calls
 
-GET /api/media 
-GET /api/ratings/average/{movieId}
-POST ​/api​/ratings​/add
+Media (which can be a movie or a tv show)
+ - GET /api/media 
+ - GET /api/ratings/average/{movieId}
+ - POST ​/api​/ratings​/add
 
 Just for stored procedures testing
-/api/reports/rated
-​/api​/reports​/screened
-/api/reports/sold
 
-POST ​/api​/tickets​/buy
+ - GET /api/reports/rated
+ - GET​/api​/reports​/screened
+ - GET/api/reports/sold
 
-POST /api/users/register
-POST /api/users/login
+Tickets and screening
+ - POST ​/api​/tickets​/buy
+
+Authentication
+ - POST /api/users/register
+ - POST /api/users/login
