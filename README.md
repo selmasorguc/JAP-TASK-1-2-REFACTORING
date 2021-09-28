@@ -9,20 +9,21 @@ Technologies used:
 This task is continuing on the original JAP Task 1. The goal is to fix implementation and architectural mistakes made. 
 
 The solution is structured in 3 main parts:
-CORE
+
+### CORE
  Consists of:
   - Entities
   - DTOs
   - Services
   - Interfaces
   
-INFRASTRUCTURE
+### INFRASTRUCTURE
  Consists of:
   - Everything related to the database - Migration and Dataseed
   - Automapper
   - Repositories
   
-WEB
+### WEB
 Is the main startup project that consists of
   - Controllers
   - Configuration and Startup
