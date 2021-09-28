@@ -54,7 +54,7 @@ After you make the login API call, copy the token and click on the Authorize but
 ![image](https://user-images.githubusercontent.com/89447689/135116392-aed98203-367b-4f9e-b323-e063bd1f713c.png)
 
 
-#API calls
+## API calls
 
 GET /api/media 
 GET /api/ratings/average/{movieId}
