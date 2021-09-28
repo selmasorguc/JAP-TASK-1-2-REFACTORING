@@ -20,7 +20,7 @@ namespace API.Data
             _context = context;
         }
 
-        //Get 1 movie/tvshow from DB by id
+          
         public async Task<Media> GetSingleMediaAync(int id)
         {
             return await _context.Media.Include(m => m.Cast)
@@ -63,11 +63,16 @@ namespace API.Data
             if (searchTerm.ToLower().Contains("star")
             && isNumber && numericValue.ToString().Length == 1)
             {
+                //Da li ovdje treba kad ukuca 5 star da da samo 5 star, i kad ukuca 4 star samo da da 4 star a ne i 5 star
                 if (searchTerm.ToLower().Contains("at least"))
                     query = query.Where(m => m.Ratings.Average(x => x.Value) >= numericValue);
 
                 else
                     query = query.Where(m => m.Ratings.Average(x => x.Value) == numericValue);
+
+                // query = searchTerm.ToLower().Contains("at least") 
+                //         ? query.Where(m => m.Ratings.Average(x => x.Value) >= numericValue)
+                //         : query = query.Where(m => m.Ratings.Average(x => x.Value) == numericValue);
             }
 
             if (searchTerm.ToLower().Contains("year") && isNumber && numericValue.ToString().Length == 1)
