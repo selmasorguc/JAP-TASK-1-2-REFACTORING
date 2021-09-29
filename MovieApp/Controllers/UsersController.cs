@@ -17,6 +17,12 @@ namespace API.Controllers
             _authRepo = authRepo;
         }
 
+        /// <summary>
+        /// Adds new user to the DB
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns>Token</returns>
         [HttpPost("register")]
         public async Task<ActionResult<ServiceResponse<RegisterDto>>> Register(string username, string password)
         {
@@ -25,6 +31,11 @@ namespace API.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Checks if the user exists, checks if password matches
+        /// </summary>
+        /// <param name="loginDto"></param>
+        /// <returns>Token</returns>
         [HttpPost("login")]
         public async Task<ActionResult<ServiceResponse<RegisterDto>>> Login(LogInDto loginDto)
         {

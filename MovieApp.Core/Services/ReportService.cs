@@ -7,6 +7,10 @@ namespace MovieApp.Core.Services
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
+    /// <summary>
+    /// Executes stored procedures
+    /// Check the ReportRepository
+    /// </summary>
     public class ReportService : IReportService
     {
         public readonly IReportRepository _reportRepository;

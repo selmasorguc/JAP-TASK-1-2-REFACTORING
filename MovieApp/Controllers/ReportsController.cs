@@ -9,30 +9,23 @@ namespace API.Controllers
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Defines the <see cref="ReportsController" />.
+    /// API end points created for the Task 2 stored procedures testing
     /// </summary>
     [ApiController]
     [Route("api/reports")]
     public class ReportsController : ControllerBase
     {
-        /// <summary>
-        /// Defines the _moviesSPService.
-        /// </summary>
         private readonly IReportService _moviesSPService;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReportsController"/> class.
-        /// </summary>
-        /// <param name="moviesSPService">The moviesSPService<see cref="IReportService"/>.</param>
         public ReportsController(IReportService moviesSPService)
         {
             _moviesSPService = moviesSPService;
         }
 
         /// <summary>
-        /// The GetTopRated.
+        ///Gets 10 movies with the most ratings, ordered by rating descending 
         /// </summary>
-        /// <returns>The <see cref="Task{ServiceResponse{List{Top10Item}}}"/>.</returns>
+        /// <returns>movie ID, movie name, number of ratings, movie rating as Top10Item entity</returns>
         [HttpGet("rated")]
         public async Task<ServiceResponse<List<Top10Item>>> GetTopRated()
         {
@@ -42,11 +35,11 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// The GetTopScreened.
+        ///Gets 10 movies with the most screenings ordered by descending, for the period start date - end date
         /// </summary>
-        /// <param name="startDate">The startDate<see cref="DateTime"/>.</param>
-        /// <param name="endDate">The endDate<see cref="DateTime"/>.</param>
-        /// <returns>The <see cref="Task{ServiceResponse{List{TopScreened}}}"/>.</returns>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns>movie ID, movie name, number of screenings as TopScreened entity</returns>
         [HttpGet("screened")]
         public async Task<ServiceResponse<List<TopScreened>>> GetTopScreened(
                                                               DateTime startDate, DateTime endDate)
@@ -57,9 +50,9 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// The GetTopSold.
+        ///Gets movies with the most sold tickets that don’t have ratings, grouped by screening
         /// </summary>
-        /// <returns>The <see cref="Task{ServiceResponse{List{TopSold}}}"/>.</returns>
+        /// <returns>movie ID, movie name, screening, tickets sold as TopSold entity</returns>
         [HttpGet("sold")]
         public async Task<ServiceResponse<List<TopSold>>> GetTopSold()
         {

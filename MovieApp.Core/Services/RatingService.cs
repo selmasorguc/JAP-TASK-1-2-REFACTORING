@@ -23,6 +23,11 @@ namespace MovieApp.Core.Services
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Gets average rating of a media by id
+        /// </summary>
+        /// <param name="mediaId"></param>
+        /// <returns>Average rating as double</returns>
         public async Task<ServiceResponse<double>> GetAverageRatingAsync(int mediaId)
         {
             var serviceResponse = new ServiceResponse<double>();
@@ -52,14 +57,21 @@ namespace MovieApp.Core.Services
             return serviceResponse;
         }
 
+        /// <summary>
+        /// Rates media  - adding a new rating to the DB
+        /// </summary>
+        /// <param name="rating"></param>
+        /// <returns>New average rating of that media</returns>
         public async Task<ServiceResponse<double>> RateMovieAsync(RatingDto rating)
         {
             var serviceResponse = new ServiceResponse<double>();
             try
             {
+                //Find the media by id and check if it exists
                 var media = await _mediaRepository.GetSingleMediaAync(rating.MediaId);
                 if (media == null) throw new ArgumentException("Media does not exist");
 
+                //Add new rating to the DB and update the rated media wih this new rating
                 await _ratingRepository.AddRating(_mapper.Map<Rating>(rating));
                 await _mediaRepository.UpdateAfterRating(rating.MediaId);
                 serviceResponse.Data = media.Ratings.Select(x => x.Value).Average();

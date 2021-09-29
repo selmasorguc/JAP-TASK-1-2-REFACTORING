@@ -20,6 +20,11 @@ namespace API.Controllers
             _ticketService = ticketService;
         }
 
+        /// <summary>
+        /// Buying a new ticket functionality - adds new ticket to the DB, updates screening and the media
+        /// </summary>
+        /// <param name="ticket"></param>
+        /// <returns>Bought ticket added to the DB</returns>
         [HttpPost("buy")]
         public async Task<ActionResult<ServiceResponse<AddTicketDto>>> BuyTicket(TicketDto ticket)
         {

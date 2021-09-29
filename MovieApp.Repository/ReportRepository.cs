@@ -6,6 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Class that executes stored procedures queries 
+/// Check ReportController 
+/// </summary>
 namespace MovieApp.Repository
 {
     public class ReportRepository : IReportRepository

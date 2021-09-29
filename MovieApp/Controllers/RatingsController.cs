@@ -17,6 +17,11 @@ namespace API.Controllers
             _ratingService = ratingService;
         }
 
+        /// <summary>
+        /// Caluclates and returns current average rating of a media by media id
+        /// </summary>
+        /// <param name="movieId"></param>
+        /// <returns>Average Rating as double</returns>
         [HttpGet("average/{movieId}")]
         public async Task<ActionResult<ServiceResponse<double>>> GetAverageRating(int movieId)
         {
@@ -25,6 +30,11 @@ namespace API.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Adds a new rating to the DB and updates the media with this new rating
+        /// </summary>
+        /// <param name="rating"></param>
+        /// <returns>New average rating of the media as double</returns>
         [HttpPost("add")]
         public async Task<ActionResult<double>> AddRating(RatingDto rating)
         {

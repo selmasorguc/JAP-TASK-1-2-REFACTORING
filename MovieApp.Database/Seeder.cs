@@ -8,6 +8,9 @@ namespace MovieApp.Database
     using System.Text.Json;
     using System.Threading.Tasks;
 
+    /// <summary>
+    /// Seeds data to the local Sql database from a json file 
+    /// </summary>
     public class Seeder
     {
         public static async Task SeedData(DataContext context)

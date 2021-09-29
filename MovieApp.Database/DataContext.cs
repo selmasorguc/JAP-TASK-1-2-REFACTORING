@@ -12,6 +12,7 @@ namespace MovieApp.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //Stored procedures models
             modelBuilder.Entity<Top10Item>().HasNoKey();
             modelBuilder.Entity<TopScreened>().HasNoKey();
             modelBuilder.Entity<TopSold>().HasNoKey();

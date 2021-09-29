@@ -29,6 +29,12 @@ namespace MovieApp.Core.Services
             _mediaRepository = mediaRepository;
         }
 
+        /// <summary>
+        /// Buying a ticket functionality - add a new ticket and update the screening and media
+        /// </summary>
+        /// <param name="ticket"></param>
+        /// <param name="username"></param>
+        /// <returns>Bought ticket thats been added to the DB</returns>
         public async Task<ServiceResponse<AddTicketDto>> BuyTicket(TicketDto ticket, string username)
         {
             var serviceResponse = new ServiceResponse<AddTicketDto>();
@@ -43,10 +49,12 @@ namespace MovieApp.Core.Services
 
                 var screening = await _screeningRepository.UpdateScreening(ticket.ScreeningId);
 
+                //Make sure ticket is bought for a future screening
                 if (screening.StartTime < DateTime.Today)
                     throw new ArgumentException(
                            "Cannot buy ticket for screening is in the past");
 
+                //Creating a new ticket DTO
                 var addTicket = new AddTicketDto
                 {
                     Price = ticket.Price,
@@ -55,6 +63,7 @@ namespace MovieApp.Core.Services
                     ScreeningId = screening.Id
                 };
 
+                //Addting the new ticket to DB
                 await _ticketRepository.AddTicket(_mapper.Map<Ticket>(addTicket));
                 serviceResponse.Data = addTicket;
             }

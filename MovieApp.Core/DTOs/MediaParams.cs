@@ -4,7 +4,7 @@ namespace MovieApp.Core.DTOs
 {
     public class MediaParams
     {
-        private const int MaxPageSize = 50;
+        private const int MaxPageSize = 20;
 
         public int PageNumber { get; set; } = 1;
 

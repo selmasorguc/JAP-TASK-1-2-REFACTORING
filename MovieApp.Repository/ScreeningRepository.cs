@@ -20,6 +20,11 @@ namespace MovieApp.Repository
             return await _context.Screenings.FirstOrDefaultAsync(x => x.Id == id);
         }
         
+        /// <summary>
+        /// Updates a screening after a ticket has been bought
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Updated screening</returns>
         public async Task<Screening> UpdateScreening(int id)
         {
             var screening = await GetScreening(id);

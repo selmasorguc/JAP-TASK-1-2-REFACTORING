@@ -15,14 +15,9 @@ namespace MovieApp.Repository
             _context = context;
         }
 
-        public Task<bool> AddRating(Rating rating)
+        public async Task<bool> AddRating(Rating rating)
         {
             _context.Ratings.Add(rating);
-            return SaveAllAsync();
-        }
-
-        public async Task<bool> SaveAllAsync()
-        {
             return await _context.SaveChangesAsync() > 0;
         }
     }
