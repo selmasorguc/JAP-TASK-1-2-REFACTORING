@@ -3,6 +3,7 @@ namespace MovieApp.Middleware
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
+    using MovieApp.Core.Interfaces;
     using MovieApp.Errors;
     using System;
     using System.Net;
@@ -16,15 +17,16 @@ namespace MovieApp.Middleware
         private readonly IHostEnvironment _env;
 
         private readonly ILogger<ExceptionMiddleware> _logger;
+        public ILoggerManager _loggerManager { get; }
 
         public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger,
-        IHostEnvironment env)
+        IHostEnvironment env, ILoggerManager loggerManager)
         {
             _env = env;
+            _loggerManager = loggerManager;
             _logger = logger;
             _next = next;
         }
-
         public async Task InvokeAsync(HttpContext context)
         {
             try
@@ -34,6 +36,7 @@ namespace MovieApp.Middleware
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
+                _loggerManager.LogMessage(ex.Message);
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 

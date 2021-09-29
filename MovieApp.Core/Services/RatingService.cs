@@ -31,27 +31,20 @@ namespace MovieApp.Core.Services
         public async Task<ServiceResponse<double>> GetAverageRatingAsync(int mediaId)
         {
             var serviceResponse = new ServiceResponse<double>();
-            try
-            {
-                var media = await _mediaRepository.GetSingleMediaAync(mediaId);
-                if (media == null) throw new ArgumentException("Media does not exist");
 
-                //Check if movie has any ratings
-                if (media.Ratings.Count() == 0)
-                {
-                    serviceResponse.Data = 0;
-                    serviceResponse.Message = "Movie has no ratings yet";
-                }
-                else
-                {
-                    serviceResponse.Data = media.Ratings.Select(x => x.Value).Average();
-                    serviceResponse.Message = "Average rating of movie found";
-                }
-            }
-            catch (Exception ex)
+            var media = await _mediaRepository.GetSingleMediaAync(mediaId);
+            if (media == null) throw new Exception("Media is invalid");
+
+            //Check if movie has any ratings
+            if (media.Ratings.Count() == 0)
             {
-                serviceResponse.Success = false;
-                serviceResponse.Message = ex.Message;
+                serviceResponse.Data = 0;
+                serviceResponse.Message = "Movie has no ratings yet";
+            }
+            else
+            {
+                serviceResponse.Data = media.Ratings.Select(x => x.Value).Average();
+                serviceResponse.Message = "Average rating of movie found";
             }
 
             return serviceResponse;
@@ -65,22 +58,16 @@ namespace MovieApp.Core.Services
         public async Task<ServiceResponse<double>> RateMovieAsync(RatingDto rating)
         {
             var serviceResponse = new ServiceResponse<double>();
-            try
-            {
-                //Find the media by id and check if it exists
-                var media = await _mediaRepository.GetSingleMediaAync(rating.MediaId);
-                if (media == null) throw new ArgumentException("Media does not exist");
 
-                //Add new rating to the DB and update the rated media wih this new rating
-                await _ratingRepository.AddRating(_mapper.Map<Rating>(rating));
-                await _mediaRepository.UpdateAfterRating(rating.MediaId);
-                serviceResponse.Data = media.Ratings.Select(x => x.Value).Average();
-            }
-            catch (Exception ex)
-            {
-                serviceResponse.Success = false;
-                serviceResponse.Message = ex.Message;
-            }
+            //Find the media by id and check if it exists
+            var media = await _mediaRepository.GetSingleMediaAync(rating.MediaId);
+            if (media == null) throw new Exception("Media is invalid");
+
+            //Add new rating to the DB and update the rated media wih this new rating
+            await _ratingRepository.AddRating(_mapper.Map<Rating>(rating));
+            await _mediaRepository.UpdateAfterRating(rating.MediaId);
+            serviceResponse.Data = media.Ratings.Select(x => x.Value).Average();
+
             return serviceResponse;
         }
     }

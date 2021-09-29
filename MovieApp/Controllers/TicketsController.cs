@@ -28,6 +28,7 @@ namespace API.Controllers
         [HttpPost("buy")]
         public async Task<ActionResult<ServiceResponse<AddTicketDto>>> BuyTicket(TicketDto ticket)
         {
+            //Getting the username from the token 
             var username = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             var serviceResponse = await _ticketService.BuyTicket(ticket, username);

@@ -39,22 +39,21 @@ namespace MovieApp.Core.Services
         {
             var serviceResponse = new ServiceResponse<AddTicketDto>();
 
-            try
+            //Check if movie and user exist in the DB
+            if (!(await _mediaRepository.MediaExists(ticket.MediaId)))
+                throw new ArgumentException("Movie id is not valid.");
+
+            var screening = await _screeningRepository.GetScreening(ticket.ScreeningId);
+            if(screening == null) throw new ArgumentException("Screening id is not valid.");
+
+            if (screening.StartTime < DateTime.Today)
             {
-                //Check if movie and user exist in the DB
-                if (!(await _mediaRepository.MediaExists(ticket.MediaId)))
-                    throw new ArgumentException("Movie id is not valid.");
-
+                serviceResponse.Success = false;
+                serviceResponse.Message = "You cannot buy a ticket for screening in past";
+            }
+            else
+            {
                 var user = await _authRepository.GetUserByUsernameAsync(username);
-
-                var screening = await _screeningRepository.UpdateScreening(ticket.ScreeningId);
-
-                //Make sure ticket is bought for a future screening
-                if (screening.StartTime < DateTime.Today)
-                    throw new ArgumentException(
-                           "Cannot buy ticket for screening is in the past");
-
-                //Creating a new ticket DTO
                 var addTicket = new AddTicketDto
                 {
                     Price = ticket.Price,
@@ -63,16 +62,13 @@ namespace MovieApp.Core.Services
                     ScreeningId = screening.Id
                 };
 
+                screening = await _screeningRepository.UpdateScreening(ticket.ScreeningId);
+
                 //Addting the new ticket to DB
                 await _ticketRepository.AddTicket(_mapper.Map<Ticket>(addTicket));
                 serviceResponse.Data = addTicket;
             }
-            catch (Exception ex)
-            {
-                serviceResponse.Data = null;
-                serviceResponse.Message = ex.Message;
-                serviceResponse.Success = false;
-            }
+               
             return serviceResponse;
         }
     }

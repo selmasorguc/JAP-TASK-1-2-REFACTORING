@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using MovieApp.Extensions;
+using MovieApp.Middleware;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,14 +36,16 @@ namespace MovieApp
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MovieApp v1"));
             }
+            app.UseMiddleware<ExceptionMiddleware>();
+
+            loggerFactory.AddLog4Net();
 
             app.UseHttpsRedirection();
 

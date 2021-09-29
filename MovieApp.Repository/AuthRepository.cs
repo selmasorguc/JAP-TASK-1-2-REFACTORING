@@ -31,32 +31,26 @@ namespace MovieApp.Repository
         public async Task<ServiceResponse<RegisterDto>> Login(LogInDto loginDto)
         {
             var serviceResponse = new ServiceResponse<RegisterDto>();
-            try
+
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == loginDto.Username);
+
+            using var hmac = new HMACSHA512(user.PasswordSalt);
+            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password));
+
+            for (int i = 0; i < computedHash.Length; i++)
             {
-                var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == loginDto.Username);
-
-                using var hmac = new HMACSHA512(user.PasswordSalt);
-                var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password));
-
-                for (int i = 0; i < computedHash.Length; i++)
+                if (computedHash[i] != user.PasswordHash[i])
                 {
-                    if (computedHash[i] != user.PasswordHash[i])
-                    {
-                        throw new AuthenticationException("Wrong Password");
-                    }
+                    throw new AuthenticationException("Wrong Password");
                 }
+            }
 
-                serviceResponse.Data = new RegisterDto
-                {
-                    Username = loginDto.Username,
-                    Token = CreateToken(user)
-                };
-            }
-            catch (Exception ex)
+            serviceResponse.Data = new RegisterDto
             {
-                serviceResponse.Message = ex.Message;
-                serviceResponse.Success = false;
-            }
+                Username = loginDto.Username,
+                Token = CreateToken(user)
+            };
+
 
             return serviceResponse;
         }
@@ -64,38 +58,32 @@ namespace MovieApp.Repository
         public async Task<ServiceResponse<RegisterDto>> Register(string username, string password)
         {
             var serviceResponse = new ServiceResponse<RegisterDto>();
-            try
+
+
+            if (await UserExists(username, password))
             {
-
-                if (await UserExists(username, password))
-                {
-                    throw new ArgumentException(
-                           "User not found");
-                }
-
-                using var hmac = new HMACSHA512();
-
-                var user = new User
-                {
-                    Username = username,
-                    PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password)),
-                    PasswordSalt = hmac.Key
-                };
-
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
-
-                serviceResponse.Data = new RegisterDto
-                {
-                    Username = username,
-                    Token = CreateToken(user)
-                };
+                throw new ArgumentException(
+                       "User not found");
             }
-            catch (Exception ex)
+
+            using var hmac = new HMACSHA512();
+
+            var user = new User
             {
-                serviceResponse.Message = ex.Message;
-                serviceResponse.Success = false;
-            }
+                Username = username,
+                PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password)),
+                PasswordSalt = hmac.Key
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            serviceResponse.Data = new RegisterDto
+            {
+                Username = username,
+                Token = CreateToken(user)
+            };
+
             return serviceResponse;
         }
 

@@ -30,9 +30,7 @@ namespace MovieApp.Repository
             return await _context.Media.Include(m => m.Cast)
                                        .Include(m => m.Ratings)
                                        .Include(x => x.Screenings)
-                                       .OrderByDescending(x => x.Ratings
-                                       .Select(x => x.Value).Average()).Include(m => m.Ratings)
-                                       .FirstOrDefaultAsync(m => m.Id == id);
+                                       .SingleOrDefaultAsync(m => m.Id == id);
         }
 
         /// <summary>
@@ -50,10 +48,9 @@ namespace MovieApp.Repository
 
             if (mediaParams.MediaType != null) query = query.Where(m => m.MediaType == mediaParams.MediaType);
 
-            List<Media> movies = await query.OrderByDescending(x => x.Ratings.Select(x => x.Value).Average())
+            return await query.OrderByDescending(x => x.Ratings.Select(x => x.Value).Average())
                                              .Skip((mediaParams.PageNumber - 1) * mediaParams.PageSize)
                                              .Take(mediaParams.PageSize).ToListAsync();
-            return movies;
         }
 
         //Private function that expands the basic query with a search filter applied
@@ -78,16 +75,17 @@ namespace MovieApp.Repository
             if (searchTerm.ToLower().Contains("star")
             && isNumber && numericValue.ToString().Length == 1)
             {
-                //Da li ovdje treba kad ukuca 5 star da da samo 5 star, i kad ukuca 4 star samo da da 4 star a ne i 5 star
                 if (searchTerm.ToLower().Contains("at least"))
                     query = query.Where(m => m.Ratings.Average(x => x.Value) >= numericValue);
 
                 else
-                    query = query.Where(m => m.Ratings.Average(x => x.Value) == numericValue);
-
+                    query = query.Where(m => m.Ratings.Average(x => x.Value) >= numericValue 
+                                             && m.Ratings.Average(x => x.Value) < numericValue + 1);
+                //da li je ovo bolje
                 // query = searchTerm.ToLower().Contains("at least") 
                 //         ? query.Where(m => m.Ratings.Average(x => x.Value) >= numericValue)
-                //         : query = query.Where(m => m.Ratings.Average(x => x.Value) == numericValue);
+                //         : query = queryWhere(m => m.Ratings.Average(x => x.Value) >= numericValue 
+                //                             && m.Ratings.Average(x => x.Value) < numericValue + 1);
             }
 
             if (searchTerm.ToLower().Contains("year") && isNumber && numericValue.ToString().Length == 1)

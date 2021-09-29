@@ -44,6 +44,9 @@ namespace MovieApp.Extensions
                     ValidateAudience = false
                 };
             });
+
+            services.AddSingleton<ILoggerManager, LoggerManager>();
+
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
             services.AddScoped<IMediaRepository, MediaRepository>();
