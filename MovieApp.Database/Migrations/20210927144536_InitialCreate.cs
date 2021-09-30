@@ -207,6 +207,53 @@ namespace API.Data.Migrations
                 name: "IX_Tickets_UserId",
                 table: "Tickets",
                 column: "UserId");
+
+            //STORED PROCEDURES
+            var procedureTopRated = @"CREATE PROCEDURE spGet_Top10_RatedMovies
+                                        AS
+                                        BEGIN
+                                            SELECT TOP(10) m.Id as MediaId, m.Title as MediaTitle, Count(r.Value) as TotalRatings, AVG(r.Value) as AverageRating
+                                            FROM Media m
+                                            INNER JOIN dbo.Ratings r
+                                            ON m.Id = r.MediaId
+                                            GROUP BY m.Id, Title
+                                            HAVING Count(r.Value) >= (SELECT COUNT(rr.Value)
+                                                        FROM dbo.Ratings rr
+                                                        INNER JOIN dbo.Media mm
+                                                        ON mm.Id = rr.MediaId
+                                                        GROUP BY mm.Id
+                                                        ORDER BY COUNT(r.Value) DESC
+                                                        OFFSET 10 ROWS
+                                                        FETCH NEXT 1 ROWS ONLY)
+                                            ORDER BY AVG(r.Value) DESC
+                                        END";
+            migrationBuilder.Sql(procedureTopRated);
+
+            var procedureTopScreened = @"CREATE PROCEDURE spGet_Top10_ScreenedMovies
+                                                           @StartDate date,
+                                                           @EndDate date
+                                        AS
+                                        BEGIN
+                                                SELECT TOP(10) m.Id as MediaId, m.Title as MediaTitle, COUNT(s.Id) AS TotalScreenings
+	                                            FROM Media m, Screenings s
+	                                            WHERE m.Id = s.MovieId AND m.MediaType = 0
+	                                            AND @StartDate <=  s.StartTime
+	                                            AND s.StartTime  <= @EndDate
+	                                            GROUP BY m.Id ,m.Title
+	                                            ORDER BY COUNT(s.Id) DESC
+                                        END";
+            migrationBuilder.Sql(procedureTopScreened);
+
+            var procedureTopSold = @"CREATE PROCEDURE spGet_Top_Sold_Movies
+                                    AS
+                                    BEGIN
+                                            SELECT m.Id as MediaId, m.Title as MediaTitle, t.ScreeningId AS ScreeningId, COUNT(t.Id) as TicketsSold
+                                            FROM Media m, Tickets t
+                                            GROUP BY m.Id, t.MediaId, m.Title, t.ScreeningId
+                                            HAVING (SELECT COUNT(*) FROM Ratings r WHERE r.MediaId = m.Id) = 0 AND m.Id = t.MediaId
+                                            ORDER BY COUNT(t.Id) DESC
+                                    END";
+            migrationBuilder.Sql(procedureTopSold);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
