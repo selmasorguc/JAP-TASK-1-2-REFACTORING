@@ -44,9 +44,11 @@ namespace MovieApp.Repository
                                              .Include(m => m.Ratings)
                                              .Include(x => x.Screenings).AsQueryable();
 
-            if (mediaParams.SearchQuery != null) query = SearchFilter(query, mediaParams.SearchQuery);
+            if (!string.IsNullOrEmpty(mediaParams.SearchQuery))
+                query = SearchFilter(query, mediaParams.SearchQuery);
 
-            if (mediaParams.MediaType != null) query = query.Where(m => m.MediaType == mediaParams.MediaType);
+            if (mediaParams.MediaType != null)
+                query = query.Where(m => m.MediaType == mediaParams.MediaType);
 
             return await query.OrderByDescending(x => x.Ratings.Select(x => x.Value).Average())
                                              .Skip((mediaParams.PageNumber - 1) * mediaParams.PageSize)
@@ -62,50 +64,37 @@ namespace MovieApp.Repository
         /// <returns>The <see cref="IQueryable{Media}"/>.</returns>
         private IQueryable<Media> SearchFilter(IQueryable<Media> query, string searchTerm)
         {
-            //First we search by title and description
-            query = query.Where(m => m.Title.ToLower()
-                                             .Contains(searchTerm.ToLower()) || m.Description.ToLower()
-                                             .Contains(searchTerm.ToLower()));
-
             //Keywords check 
             //Checking if the user looked for movies based on rating or release year
             int numericValue;
             bool isNumber = int.TryParse(Regex.Match(searchTerm, @"\d+").Value, out numericValue);
 
-            if (searchTerm.ToLower().Contains("star")
-            && isNumber && numericValue.ToString().Length == 1)
-            {
-                if (searchTerm.ToLower().Contains("at least"))
-                    query = query.Where(m => m.Ratings.Average(x => x.Value) >= numericValue);
-
-                else
-                    query = query.Where(m => m.Ratings.Average(x => x.Value) >= numericValue 
-                                             && m.Ratings.Average(x => x.Value) < numericValue + 1);
-                //da li je ovo bolje
-                // query = searchTerm.ToLower().Contains("at least") 
-                //         ? query.Where(m => m.Ratings.Average(x => x.Value) >= numericValue)
-                //         : query = queryWhere(m => m.Ratings.Average(x => x.Value) >= numericValue 
-                //                             && m.Ratings.Average(x => x.Value) < numericValue + 1);
-            }
-
-            if (searchTerm.ToLower().Contains("year") && isNumber && numericValue.ToString().Length == 1)
-            {
-                if (searchTerm.ToLower().Contains("older"))
-                    query = query.Where(m => DateTime.Now.Year - m.ReleaseDate.Year >= numericValue);
-
-                else
-                    query = query.Where(m => DateTime.Now.Year - m.ReleaseDate.Year <= numericValue);
-            }
-
             if (isNumber && numericValue.ToString().Length == 4)
             {
-                if (searchTerm.ToLower().Contains("after"))
-                    query = query.Where(m => m.ReleaseDate.Year > numericValue);
-
-                else
-                    query = query.Where(m => m.ReleaseDate.Year == numericValue);
-
+                query = searchTerm.ToLower().Contains("after")
+                        ? query.Where(m => m.ReleaseDate.Year > numericValue)
+                        : query.Where(m => m.ReleaseDate.Year == numericValue);
             }
+            else if (searchTerm.ToLower().Contains("star") && isNumber && numericValue.ToString().Length == 1)
+            {
+                query = searchTerm.ToLower().Contains("at least")
+                        ? query.Where(m => m.Ratings.Average(x => x.Value) >= numericValue - 0.4)
+                        : query.Where(m => m.Ratings.Average(x => x.Value) >= numericValue - 0.4
+                                           && m.Ratings.Average(x => x.Value) <= numericValue + 0.5);
+            }
+
+            else if (searchTerm.ToLower().Contains("year") && isNumber && numericValue.ToString().Length == 1)
+            {
+                query = searchTerm.ToLower().Contains("older")
+                        ? query.Where(m => DateTime.Now.Year - m.ReleaseDate.Year >= numericValue)
+                        : query.Where(m => DateTime.Now.Year - m.ReleaseDate.Year <= numericValue);
+            }
+            else
+            {
+                query = query.Where(m => m.Title.ToLower().Contains(searchTerm.ToLower()) ||
+                                m.Description.ToLower().Contains(searchTerm.ToLower()));
+            }
+
             return query;
         }
         public async Task<bool> MediaExists(int id)

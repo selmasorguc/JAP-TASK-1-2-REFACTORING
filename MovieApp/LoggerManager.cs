@@ -1,13 +1,10 @@
 ﻿using log4net;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using System.Xml;
-using MovieApp.Core.Interfaces;
 using log4net.Config;
+using MovieApp.Core.Interfaces;
+using System;
+using System.IO;
+using System.Reflection;
+using System.Xml;
 
 namespace MovieApp
 {

@@ -19,7 +19,7 @@ namespace MovieApp.Repository
         {
             return await _context.Screenings.SingleOrDefaultAsync(x => x.Id == id);
         }
-        
+
         /// <summary>
         /// Updates a screening after a ticket has been bought
         /// </summary>
@@ -27,19 +27,15 @@ namespace MovieApp.Repository
         /// <returns>Updated screening</returns>
         public async Task<Screening> UpdateScreening(int id)
         {
-            var screening = await GetScreening(id);
-            if (screening == null) throw Exception("Screening does not exists in the DB");
+            var screening = await _context.Screenings.SingleOrDefaultAsync(x => x.Id == id);
+            if (screening == null)
+                throw new Exception("Screening does not exists in the DB");
 
             screening.MaxSeatsNumber -= 1;
             _context.Screenings.Update(screening);
             await _context.SaveChangesAsync();
 
             return screening;
-        }
-
-        private Exception Exception(string v)
-        {
-            throw new NotImplementedException();
         }
     }
 }

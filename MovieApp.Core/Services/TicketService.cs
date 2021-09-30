@@ -44,7 +44,7 @@ namespace MovieApp.Core.Services
                 throw new ArgumentException("Movie id is not valid.");
 
             var screening = await _screeningRepository.GetScreening(ticket.ScreeningId);
-            if(screening == null) throw new ArgumentException("Screening id is not valid.");
+            if (screening == null) throw new ArgumentException("Screening id is not valid.");
 
             if (screening.StartTime < DateTime.Today)
             {
@@ -68,7 +68,7 @@ namespace MovieApp.Core.Services
                 await _ticketRepository.AddTicket(_mapper.Map<Ticket>(addTicket));
                 serviceResponse.Data = addTicket;
             }
-               
+
             return serviceResponse;
         }
     }

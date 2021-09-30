@@ -25,7 +25,7 @@ namespace MovieApp.Controllers
         /// <param name="movieParams"></param>
         /// <returns>List of media</returns>
         [HttpGet]
-        
+
         public async Task<ActionResult<List<MediaDto>>> GetMedia(
             [FromQuery] MediaParams movieParams)
         {

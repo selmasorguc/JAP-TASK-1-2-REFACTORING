@@ -1,6 +1,5 @@
 namespace MovieApp.Repository
 {
-    using Microsoft.EntityFrameworkCore;
     using MovieApp.Core.Entities;
     using MovieApp.Core.Interfaces;
     using MovieApp.Database;
