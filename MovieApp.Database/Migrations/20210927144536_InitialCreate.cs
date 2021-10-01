@@ -236,7 +236,7 @@ namespace API.Data.Migrations
                                         BEGIN
                                                 SELECT TOP(10) m.Id as MediaId, m.Title as MediaTitle, COUNT(s.Id) AS TotalScreenings
 	                                            FROM Media m, Screenings s
-	                                            WHERE m.Id = s.MovieId AND m.MediaType = 0
+	                                            WHERE m.Id = s.MediaId AND m.MediaType = 0
 	                                            AND @StartDate <=  s.StartTime
 	                                            AND s.StartTime  <= @EndDate
 	                                            GROUP BY m.Id ,m.Title
