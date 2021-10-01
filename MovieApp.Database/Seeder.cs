@@ -17,7 +17,7 @@ namespace MovieApp.Database
         {
             if (await context.Media.AnyAsync()) return;
 
-            var mediaData = await System.IO.File.ReadAllTextAsync("Data/MovieSeedData.json");
+            var mediaData = await System.IO.File.ReadAllTextAsync("../MovieApp.Database/MovieSeedData.json");
             var media = JsonSerializer.Deserialize<List<Media>>(mediaData);
 
             foreach (var item in media)
